@@ -60,16 +60,15 @@ services:
             - discovery
         networks:
             - elbuensabor_network
-       #         ipv4_address: 172.18.0.100 los microservicios no necesitan ip fija
+       
                 
     usuarios:
         build:
             context: ./usuario
             dockerfile: dockerfile
-        # Dependencias de otros servicios
-        depends_on:
-            - usuarios-db
-            - discovery
+        deploy:
+            mode: replicated
+            replicas: 1  # Se empieza con 1 y va subiendo
         networks:
             - elbuensabor_network
         #        ipv4_address: 172.18.0.114 los microservicios no necesitan ip fija
