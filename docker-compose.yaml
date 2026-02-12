@@ -11,9 +11,13 @@ services:
             - mysql_data:/var/lib/mysql
         ports:
             - "3307:3306"
-        networks:
-            elbuensabor_network:
-                ipv4_address: 172.18.0.202
+        #networks:
+            #elbuensabor_network:
+                #ipv4_address: 172.18.0.202
+                # Ejecutar estas lineas para el usuario y contraseña requerido
+                # docker exec -it elbuensabor_mysql mysql -u root -p
+                # CREATE USER 'redStak' IDENTIFIED BY 'qu1Nch1nK';
+                # GRANT SELECT, INSERT, UPDATE, DELETE, CREATE, DROP ON *.* TO 'redStak';
 
     usuarios-db:
         image: postgres
