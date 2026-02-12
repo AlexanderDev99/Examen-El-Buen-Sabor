@@ -1,0 +1,88 @@
+version: '3.8'
+
+services:
+    reservas-db:
+        image: mysql:8.0
+        container_name: elbuensabor_mysql
+        environment:
+            MYSQL_ROOT_PASSWORD: rootroot
+            MYSQL_DATABASE: elbuensabor_db
+        volumes:
+            - mysql_data:/var/lib/mysql
+        ports:
+            - "3307:3306"
+        networks:
+            elbuensabor_network:
+                ipv4_address: 172.18.0.202
+
+    usuarios-db:
+        image: postgres
+        container_name: elbuensabor_postgres
+        restart: always
+        environment:
+            - POSTGRES_USER=postgres
+            - POSTGRES_PASSWORD=root
+            - POSTGRES_DB=elbuensabor_db
+        ports:
+            - "5532:5432"
+        #Anexo a reds - subreds
+        networks:
+            elbuensabor_network:
+                ipv4_address: 172.18.0.201
+
+    discovery:
+        build:
+            context: ./discovery
+            dockerfile: dockerfile
+        ports:
+            - "8761:8761"
+       # networks:
+        #    elbuensabor_network:
+         #       ipv4_address: 172.18.0.10
+                
+    gateway:
+        build:
+            context: ./gateway
+            dockerfile: dockerfile
+        ports:
+            - "8080:8080"
+        networks:
+            elbuensabor_network:
+               ipv4_address: 172.18.0.12 
+    
+    reservas:
+        build:
+            context: ./reservas
+            dockerfile: dockerfile
+        # Dependencias de otros servicios
+        depends_on:
+            - reservas-db
+            - discovery
+        networks:
+            - elbuensabor_network
+       #         ipv4_address: 172.18.0.100 los microservicios no necesitan ip fija
+                
+    usuarios:
+        build:
+            context: ./usuario
+            dockerfile: dockerfile
+        # Dependencias de otros servicios
+        depends_on:
+            - usuarios-db
+            - discovery
+        networks:
+            - elbuensabor_network
+        #        ipv4_address: 172.18.0.114 los microservicios no necesitan ip fija
+
+volumes:
+#guardan el estado de las bases de datos en una ubicación segura gestionada por Docker en caso de apagones o reinicios de contenedores.
+    postgres_data:
+    mysql_data:
+
+
+networks:
+    elbuensabor_network:
+        driver: bridge
+        ipam:
+            config:
+                - subnet: 172.18.0.0/16
