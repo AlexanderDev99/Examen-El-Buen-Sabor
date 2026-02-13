@@ -52,7 +52,15 @@ services:
             - "8080:8080"
         networks:
             elbuensabor_network:
-               ipv4_address: 172.18.0.12 
+               ipv4_address: 172.18.0.12
+    
+    nginx:
+     image: nginx:latest
+     container_name: elbuensabor_nginx
+     volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+     ports:
+      - "80:80"
     
     reservas:
         build:
