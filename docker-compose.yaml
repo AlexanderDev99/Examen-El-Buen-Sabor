@@ -11,24 +11,28 @@ services:
             - mysql_data:/var/lib/mysql
         ports:
             - "3307:3306"
-        networks:
-            elbuensabor_network:
-                ipv4_address: 172.18.0.202
+        #networks:
+            #elbuensabor_network:
+                #ipv4_address: 172.18.0.202
+                # Ejecutar estas lineas para el usuario y contraseña requerido
+                # docker exec -it elbuensabor_mysql mysql -u root -p
+                # CREATE USER 'redStak' IDENTIFIED BY 'qu1Nch1nK';
+                # GRANT SELECT, INSERT, UPDATE, DELETE, CREATE, DROP ON *.* TO 'redStak';
 
     usuarios-db:
-        image: postgres
-        container_name: elbuensabor_postgres
+        image: mongo:7
+        container_name: elbuensabor_mongo
         restart: always
         environment:
-            - POSTGRES_USER=postgres
-            - POSTGRES_PASSWORD=root
-            - POSTGRES_DB=elbuensabor_db
+            MONGO_INITDB_ROOT_USERNAME: admin
+            MONGO_INITDB_ROOT_PASSWORD: admin123
+            MONGO_INITDB_DATABASE: elbuensabor_db
+        volumes:
+            - mongo_data:/data/db
         ports:
-            - "5532:5432"
-        #Anexo a reds - subreds
+            - "27017:27017"
         networks:
             elbuensabor_network:
-                ipv4_address: 172.18.0.201
 
     discovery:
         build:
@@ -68,23 +72,22 @@ services:
             - discovery
         networks:
             - elbuensabor_network
-       #         ipv4_address: 172.18.0.100 los microservicios no necesitan ip fija
+       
                 
     usuarios:
         build:
             context: ./usuario
             dockerfile: dockerfile
-        # Dependencias de otros servicios
-        depends_on:
-            - usuarios-db
-            - discovery
+        deploy:
+            mode: replicated
+            replicas: 1  # Se empieza con 1 y va subiendo
         networks:
             - elbuensabor_network
         #        ipv4_address: 172.18.0.114 los microservicios no necesitan ip fija
 
 volumes:
 #guardan el estado de las bases de datos en una ubicación segura gestionada por Docker en caso de apagones o reinicios de contenedores.
-    postgres_data:
+    mongo_data:
     mysql_data:
 
 
