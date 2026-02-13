@@ -44,7 +44,7 @@ services:
         #    elbuensabor_network:
          #       ipv4_address: 172.18.0.10
                 
-    gateway:
+    gateway:bnjbh
         build:
             context: ./gateway
             dockerfile: dockerfile
